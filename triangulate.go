@@ -56,15 +56,13 @@ func uct() (*Point, *Point) {
 	return nil, nil
 }
 
-type adjacencyGraph map[*Point]adjacencyList
+type adjacencyGraph map[*Point]*adjacencyList
 
 func newAdjacencyGraph(points []*Point) adjacencyGraph {
 	graph := make(adjacencyGraph)
 	for _, p := range points {
-		graph[p] = adjacencyList{
-			center: p,
-			first:  nil,
-		}
+		newList := newAdjacencyList(p)
+		graph[p] = &(newList)
 	}
 	return graph
 }
@@ -94,15 +92,40 @@ func (graph adjacencyGraph) deleteEdge(p1, p2 *Point) {
 
 type adjacencyList struct {
 	center *Point
-	first  *adjacencyListNode
+	root   *adjacencyListNode
 }
 type adjacencyListNode struct {
 	point          *Point
 	previous, next *adjacencyListNode
 }
 
-func (al adjacencyList) insert(newPoint *Point) {
+func newAdjacencyList(center *Point) adjacencyList {
+	al := adjacencyList{
+		center: center,
+		root:   &adjacencyListNode{},
+	}
+  al.root.previous = al.root
+  al.root.next = al.root
+	return al
+}
 
+func (al *adjacencyList) insert(newPoint *Point) {
+  //FIXME: does not deal with duplicate points
+  //FIXME: does not deal with points lying on a line with a point currently in the set
+	newNode := &adjacencyListNode{newPoint, nil, nil}
+  var insertionPoint *adjacencyListNode = al.root
+  for thisNeighbor := al.root.next; thisNeighbor != al.root; thisNeighbor = thisNeighbor.next {
+    cross := crossProduct(al.center, newPoint, thisNeighbor.point)
+    if (cross < 0) {
+      insertionPoint = thisNeighbor
+    } else if (insertionPoint != al.root) {
+      break
+    }
+  }
+  newNode.previous = insertionPoint
+  newNode.next = insertionPoint.next
+  insertionPoint.next.previous = newNode
+  insertionPoint.next = newNode
 }
 
 func (al adjacencyList) remove(oldPoint *Point) {
@@ -111,13 +134,8 @@ func (al adjacencyList) remove(oldPoint *Point) {
 
 func (al adjacencyList) neighbors() []*Point {
 	neighbors := make([]*Point, 0)
-	if al.first == nil {
-		return neighbors
-	}
-	neighbors = append(neighbors, al.first.point)
-	for thisNeighbor := al.first.next; thisNeighbor != al.first; thisNeighbor = thisNeighbor.next {
+	for thisNeighbor := al.root.next; thisNeighbor != al.root; thisNeighbor = thisNeighbor.next {
 		neighbors = append(neighbors, thisNeighbor.point)
 	}
-
 	return neighbors
 }

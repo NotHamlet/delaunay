@@ -90,7 +90,40 @@ func TestMST500(t *testing.T) {
 }
 
 func TestAdjacencyListInsert(t *testing.T) {
-  
+  center := &Point{-1,-1}
+  al := newAdjacencyList(center)
+  points := []*Point{
+    &Point{4,0},
+    &Point{2,2},
+    &Point{1,10},
+    &Point{-4,200},
+    &Point{-3,-1},
+  }
+
+  //randomize our list of points before adding them to AL
+  pointsCopy := make([]*Point, len(points))
+  copy(pointsCopy, points)
+  r := rand.New(rand.NewSource(5918))
+  for i,_ := range pointsCopy {
+    j := r.Intn(len(pointsCopy)-i)+i
+    pointsCopy[i],pointsCopy[j] = pointsCopy[j],pointsCopy[i]
+  }
+
+  for _,point := range pointsCopy {
+    al.insert(point)
+  }
+
+  expected := points
+  actual := al.neighbors()
+  if (len(actual) != len(expected)) {
+    t.Fail()
+  }
+  for i,point := range actual {
+    if point != expected[i] {
+      t.Fail();
+    }
+  }
+
 }
 
 func totalWeight(edges []*Edge) float64 {
