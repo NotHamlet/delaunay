@@ -1,4 +1,4 @@
-package delauney
+package delaunay
 
 import (
 	"sort"
