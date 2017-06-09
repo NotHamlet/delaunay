@@ -34,7 +34,7 @@ func mst(edges []*Edge) []*Edge {
 }
 
 func EuclideanMST(points []*Point) []*Edge {
-	edges := completeEdgeSet(points)
+	edges := Triangulate(points)
 	mst := mst(edges)
 	return mst
 }

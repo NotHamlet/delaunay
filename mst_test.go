@@ -70,6 +70,34 @@ func TestTriangulate100(t *testing.T) {
 	drawGraph(randomPoints, edges, minX, maxX, minY, maxY, fileName)
 }
 
+func TestTriangulate10000(t *testing.T) {
+	fileName := "tri10000"
+	N := 10000
+	var seed int64 = 15303972
+	minX := float64(0)
+	maxX := float64(2560)
+	minY := float64(0)
+	maxY := float64(1600)
+
+	randomPoints := makePoints(minX, maxX, minY, maxY, seed, N)
+	edges := Triangulate(randomPoints)
+	drawGraph(randomPoints, edges, minX, maxX, minY, maxY, fileName)
+}
+func TestMST10000(t *testing.T) {
+	fileName := "mst10000"
+	N := 10000
+	var seed int64 = 15303972
+	minX := float64(0)
+	maxX := float64(2560)
+	minY := float64(0)
+	maxY := float64(1600)
+
+	randomPoints := makePoints(minX, maxX, minY, maxY, seed, N)
+	mst := EuclideanMST(randomPoints)
+
+	drawGraph(randomPoints, mst, minX, maxX, minY, maxY, fileName)
+}
+
 func TestMST500(t *testing.T) {
 	fileName := "mst500"
 	N := 500
